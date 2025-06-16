@@ -6,8 +6,8 @@
   <title>Fullstack App</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f2f2f2;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #74ebd5, #ACB6E5);
       margin: 0;
       padding: 0;
       display: flex;
@@ -16,18 +16,39 @@
       height: 100vh;
     }
     .container {
-      background: #fff;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      background: #ffffffdd;
+      padding: 2rem 3rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
       text-align: center;
+      animation: fadeIn 1s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     h1 {
       color: #333;
+      margin-bottom: 1rem;
     }
     p {
       font-size: 1.2rem;
-      color: #555;
+      color: #444;
+      min-height: 1.5em;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.5rem 1.5rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      background: #4a90e2;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #357ABD;
     }
   </style>
 </head>
@@ -35,24 +56,31 @@
   <div class="container">
     <h1>Frontend</h1>
     <p id="message">Loading message...</p>
+    <button onclick="loadMessage()">Refresh</button>
   </div>
 
   <script>
-    // Automatically use the same host as the frontend, just change the port
-    const backendUrl = `${window.location.protocol}//${window.location.hostname}:3000/api/message`;
+    function loadMessage() {
+      const backendUrl = `${window.location.protocol}//${window.location.hostname}:3000/api/message`;
+      const messageEl = document.getElementById('message');
+      messageEl.innerText = 'Loading message...';
 
-    fetch(backendUrl)
-      .then(res => {
-        if (!res.ok) throw new Error('Network response was not ok');
-        return res.json();
-      })
-      .then(data => {
-        document.getElementById('message').innerText = data.message;
-      })
-      .catch(err => {
-        console.error('Fetch error:', err);
-        document.getElementById('message').innerText = 'Failed to load message.';
-      });
+      fetch(backendUrl)
+        .then(res => {
+          if (!res.ok) throw new Error('Network response was not ok');
+          return res.json();
+        })
+        .then(data => {
+          messageEl.innerText = data.message;
+        })
+        .catch(err => {
+          console.error('Fetch error:', err);
+          messageEl.innerText = 'Failed to load message.';
+        });
+    }
+
+    // Load message on first visit
+    loadMessage();
   </script>
 </body>
 </html>
