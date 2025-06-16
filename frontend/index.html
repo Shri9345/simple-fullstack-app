@@ -5,143 +5,69 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fullstack App</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500;700&family=Orbitron:wght@700&display=swap');
-
     body {
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: linear-gradient(270deg, #74ebd5, #acb6e5, #74ebd5);
-      background-size: 600% 600%;
-      animation: gradientMove 10s ease infinite;
-      font-family: 'Roboto', sans-serif;
-    }
-
-    @keyframes gradientMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    .container {
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(12px);
-      border-radius: 16px;
-      padding: 2rem;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
       text-align: center;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-      max-width: 400px;
-      width: 90%;
-      color: #fff;
+      padding: 50px;
     }
-
-    .logo {
-      width: 150px;
-      margin-bottom: 1rem;
-    }
-
     h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-      color: #fff;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+      font-size: 3em;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px #333;
     }
-
-    p {
-      font-size: 1.3rem;
-      font-weight: 500;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
-    }
-
-    button {
-      margin-top: 1rem;
-      padding: 0.7rem 2rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 8px;
-      background: #4a90e2;
-      color: #fff;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    button:hover {
-      background: #357ABD;
-      transform: scale(1.1);
-      box-shadow: 0 4px 12px rgba(74,144,226,0.4);
-    }
-
-    .timestamp {
-      font-size: 0.85rem;
-      color: #eee;
-      margin-top: 0.5rem;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
-    }
-
-    .spinner {
+    #message {
+      font-size: 2em;
+      padding: 20px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.3);
       display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid #fff;
-      border-top: 2px solid transparent;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      vertical-align: middle;
-      margin-left: 0.5rem;
+      transition: transform 0.3s ease, background 0.3s ease;
     }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    #message.updated {
+      transform: scale(1.1);
+      background: rgba(255, 255, 255, 0.2);
     }
-
-    footer {
-      margin-top: 1rem;
-      font-size: 0.8rem;
-      color: #ccc;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+    .timestamp {
+      margin-top: 10px;
+      font-size: 0.9em;
+      color: #ddd;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <img class="logo" src="https://via.placeholder.com/150x50?text=ORYFOLKS+Logo" alt="ORYFOLKS Logo" />
-    <h1>ORYFOLKS Frontend</h1>
-    <p id="message">Loading<span class="spinner" id="spinner"></span></p>
-    <div class="timestamp" id="timestamp"></div>
-    <button onclick="loadMessage()">Refresh</button>
-    <footer>Powered by ORYFOLKS</footer>
-  </div>
+  <h1>🚀 Fullstack App Frontend</h1>
+  <p id="message">Loading...</p>
+  <div class="timestamp" id="timestamp"></div>
 
   <script>
-    function loadMessage() {
-      const backendUrl = `${window.location.protocol}//${window.location.hostname}:3000/api/message`;
-      const messageEl = document.getElementById('message');
-      const timestampEl = document.getElementById('timestamp');
+    const messageEl = document.getElementById('message');
+    const timestampEl = document.getElementById('timestamp');
 
-      messageEl.innerHTML = 'Loading <span class="spinner"></span>';
+    async function fetchMessage() {
+      try {
+        const res = await fetch('http://YOUR_EC2_IP:3000/api/message');
+        const data = await res.json();
+        messageEl.innerText = data.message;
 
-      fetch(backendUrl)
-        .then(res => {
-          if (!res.ok) throw new Error('Network error');
-          return res.json();
-        })
-        .then(data => {
-          messageEl.innerText = data.message;
-          timestampEl.innerText = `Last updated: ${new Date().toLocaleTimeString()}`;
-        })
-        .catch(err => {
-          console.error(err);
-          messageEl.innerText = 'Failed to load message';
-          timestampEl.innerText = '';
-        });
+        // Add animation effect
+        messageEl.classList.add('updated');
+        setTimeout(() => messageEl.classList.remove('updated'), 500);
+
+        // Update timestamp
+        const now = new Date();
+        timestampEl.innerText = 'Last updated: ' + now.toLocaleTimeString();
+      } catch (err) {
+        messageEl.innerText = '⚠ Error fetching message';
+      }
     }
 
-    loadMessage();
-    setInterval(loadMessage, 10000);
+    // Initial fetch
+    fetchMessage();
+
+    // Auto-refresh every 5 seconds
+    setInterval(fetchMessage, 5000);
   </script>
 </body>
 </html>
