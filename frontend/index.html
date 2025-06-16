@@ -13,14 +13,16 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
     }
     .container {
-      background: #ffffffdd;
-      padding: 2rem 3rem;
+      background: #ffffffee;
+      padding: 2rem 2.5rem;
       border-radius: 12px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.2);
       text-align: center;
+      max-width: 90%;
+      width: 400px;
       animation: fadeIn 1s ease-in-out;
     }
     @keyframes fadeIn {
@@ -38,24 +40,50 @@
     }
     button {
       margin-top: 1rem;
-      padding: 0.5rem 1.5rem;
+      padding: 0.6rem 1.6rem;
       font-size: 1rem;
       border: none;
       border-radius: 6px;
       background: #4a90e2;
       color: white;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: background 0.3s, transform 0.2s;
     }
     button:hover {
       background: #357ABD;
+      transform: scale(1.05);
+    }
+    .timestamp {
+      font-size: 0.85rem;
+      color: #666;
+      margin-top: 0.5rem;
+    }
+    img.logo {
+      width: 80px;
+      margin-bottom: 1rem;
+    }
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #4a90e2;
+      border-top: 2px solid transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      margin-left: 0.5rem;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <img class="logo" src="https://via.placeholder.com/80?text=Logo" alt="Your Logo Here" />
     <h1>Frontend</h1>
-    <p id="message">Loading message...</p>
+    <p id="message">Loading message<span id="spinner" class="spinner"></span></p>
+    <div class="timestamp" id="timestamp"></div>
     <button onclick="loadMessage()">Refresh</button>
   </div>
 
@@ -63,7 +91,10 @@
     function loadMessage() {
       const backendUrl = `${window.location.protocol}//${window.location.hostname}:3000/api/message`;
       const messageEl = document.getElementById('message');
-      messageEl.innerText = 'Loading message...';
+      const spinnerEl = document.getElementById('spinner');
+      const timestampEl = document.getElementById('timestamp');
+
+      messageEl.innerHTML = 'Loading message <span id="spinner" class="spinner"></span>';
 
       fetch(backendUrl)
         .then(res => {
@@ -72,15 +103,18 @@
         })
         .then(data => {
           messageEl.innerText = data.message;
+          const now = new Date();
+          timestampEl.innerText = `Last updated at: ${now.toLocaleTimeString()}`;
         })
         .catch(err => {
           console.error('Fetch error:', err);
           messageEl.innerText = 'Failed to load message.';
+          timestampEl.innerText = '';
         });
     }
 
-    // Load message on first visit
     loadMessage();
+    setInterval(loadMessage, 10000);
   </script>
 </body>
 </html>
