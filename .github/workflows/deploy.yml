@@ -25,12 +25,20 @@ jobs:
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             set -e  # Exit on error
 
-            # Install required packages
-            sudo apt update
-            sudo apt install -y nodejs npm nginx git
+            # Update package lists
+            sudo apt-get update
+
+            # Remove potentially broken Node.js/npm
+            sudo apt-get remove -y nodejs npm || true
+
+            # Install Node.js LTS from NodeSource
+            curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+            sudo apt-get install -y nodejs nginx git
+
+            # Install PM2 globally
             sudo npm install -g pm2
 
-            # Clone or pull latest code
+            # Clone or update the app repo
             mkdir -p ~/app
             cd ~/app
 
