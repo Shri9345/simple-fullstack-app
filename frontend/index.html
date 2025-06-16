@@ -1,17 +1,57 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fullstack App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    h1 {
+      color: #333;
+    }
+    p {
+      font-size: 1.2rem;
+      color: #555;
+    }
+  </style>
 </head>
 <body>
-  <h1>Frontend</h1>
-  <p id="message">CI CD is working properly</p>
+  <div class="container">
+    <h1>Frontend</h1>
+    <p id="message">Loading message...</p>
+  </div>
 
   <script>
-    fetch('http://YOUR_EC2_IP:3000/api/message')
-      .then(res => res.json())
+    // Automatically use the same host as the frontend, just change the port
+    const backendUrl = `${window.location.protocol}//${window.location.hostname}:3000/api/message`;
+
+    fetch(backendUrl)
+      .then(res => {
+        if (!res.ok) throw new Error('Network response was not ok');
+        return res.json();
+      })
       .then(data => {
         document.getElementById('message').innerText = data.message;
+      })
+      .catch(err => {
+        console.error('Fetch error:', err);
+        document.getElementById('message').innerText = 'Failed to load message.';
       });
   </script>
 </body>
